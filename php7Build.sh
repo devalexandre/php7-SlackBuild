@@ -23,7 +23,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-
-wget -c https://downloads.php.net/~davey/php-7.1.0RC1.tar.xz -P php/
-wget -c https://slackbuilds.org/mirror/slackware/slackware-14.2/source/n/alpine/alpine-2.20.tar.xz -P alpine/
-su -c "sh php/php.SlackBuild"
+CWD=$(pwd)
+wget -c https://downloads.php.net/~davey/php-7.1.0RC1.tar.xz -P $CWD/php/
+wget -c https://slackbuilds.org/mirror/slackware/slackware-14.2/source/n/alpine/alpine-2.20.tar.xz -P $CWD/alpine/
+su -c "sh $CWD/php/php.SlackBuild"
