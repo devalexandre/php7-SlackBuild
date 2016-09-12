@@ -27,7 +27,7 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-VERSION=${VERSION:-$(echo php-*.tar.xz | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
+VERSION=${VERSION:-$(echo php/php-*.tar.xz | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 ALPINE=2.20
 BUILD=${BUILD:-1}
 
@@ -76,7 +76,7 @@ if [ -r $IMAPLIBDIR/lib${LIBDIRSUFFIX}/c-client.a ]; then
   ls -l $IMAPLIBDIR/lib${LIBDIRSUFFIX}/c-client.a
   sleep 5
 else
-  ( cd $CWD/../alpine ; ./alpine.SlackBuild || exit 1 ) || exit 1
+  ( cd $CWD/alpine ; ./alpine.SlackBuild || exit 1 ) || exit 1
   ( cd $TMP/alpine-${ALPINE}/imap/c-client
     strip -g c-client.a
     mkdir -p $IMAPLIBDIR/lib${LIBDIRSUFFIX}
@@ -98,7 +98,7 @@ fi
 
 cd $TMP
 rm -rf php-$VERSION
-tar xvf $CWD/php-$VERSION.tar.?z* || exit 1
+tar xvf $CWD/php/php-$VERSION.tar.?z* || exit 1
 cd php-$VERSION
 
 # cleanup:
@@ -107,13 +107,13 @@ find . -name "*.orig" -delete
 # Add missing(?) PEAR modules back:
 if [ -d php-$VERSION/pear/packages ]; then
   ( cd php-$VERSION/pear/packages
-    cp -a $CWD/pear/*.bz2 . 2> /dev/null
+    cp -a $CWD/php/pear/*.bz2 . 2> /dev/null
     bzip2 -d *.bz2 2> /dev/null
   )
 fi
 
 if [ "$ARCH" = "s390" ]; then
-  zcat $CWD/php.configure.s390.diff.gz | patch -p1 || exit
+  zcat $CWD/php/php.configure.s390.diff.gz | patch -p1 || exit
 fi
 
 # Fixup perms/owners:
@@ -130,8 +130,8 @@ find . -name "*.h" -exec chmod 644 {} \;
 find . -name "*.orig" -exec rm {} \;
 
 # Patch ini files:
-zcat $CWD/php.ini-development.diff.gz | patch -p1 --verbose php.ini-development || exit 1
-zcat $CWD/php.ini-development.diff.gz | patch -p1 --verbose php.ini-production || exit 1
+zcat $CWD/php/php.ini-development.diff.gz | patch -p1 --verbose php.ini-development || exit 1
+zcat $CWD/php/php.ini-development.diff.gz | patch -p1 --verbose php.ini-production || exit 1
 
 # Install the build folder into /usr/lib$LIBDIRSUFFIX/php/build
 # and adapt phpize accordingly:
@@ -265,14 +265,14 @@ rm -f $PKG/usr/lib${LIBDIRSUFFIX}/php/extensions/*.a
 
 mkdir -p $PKG/usr/doc/php-$VERSION
 cp -a \
-  CODING_STANDARDS CREDITS EXTENSIONS INSTALL LICENSE NEWS README* TODO* UPGRADING* \
+  CODING_STANDARDS CREDITS EXTENSIONS INSTALL LICENSE NEWS README* UPGRADING* \
   sapi/cgi/README.FastCGI \
   $PKG/usr/doc/php-$VERSION
 chown -R root:root $PKG/usr/doc/php-$VERSION
 chmod 644 $PKG/usr/doc/php-$VERSION/UPGRADING*
 
 mkdir -p $PKG/etc/httpd
-cat $CWD/mod_php.conf.example | sed -e "s#lib/httpd#lib${LIBDIRSUFFIX}/httpd#" \
+cat $CWD/php/mod_php.conf.example | sed -e "s#lib/httpd#lib${LIBDIRSUFFIX}/httpd#" \
   > $PKG/etc/httpd/mod_php.conf.example
 chmod 644 $PKG/etc/httpd/*
 chown root:root $PKG/etc/httpd/*
@@ -296,8 +296,8 @@ find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF \
 gzip -9 $PKG/usr/man/man?/*.?
 
 mkdir -p $PKG/install
-zcat $CWD/doinst.sh.gz > $PKG/install/doinst.sh
-cat $CWD/slack-desc > $PKG/install/slack-desc
+zcat $CWD/php/doinst.sh.gz > $PKG/install/doinst.sh
+cat $CWD/php/slack-desc > $PKG/install/slack-desc
 
 #if [ -d "$IMAPLIBDIR" ]; then
 #  ( cd $IMAPLIBDIR && rm -rf * )
